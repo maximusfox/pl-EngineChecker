@@ -8,6 +8,7 @@ use Coro::LWP;
 use Coro::Select;
 
 use LWP::UserAgent;
+use LWP::ConnCache;
 use LWP::Protocol::socks;
 
 use List::MoreUtils qw/uniq/;
@@ -47,7 +48,9 @@ print "[i] Start checking ...\n";
 for (1..$threads) {
 	push @threadsPull, async {
 		my $ua = LWP::UserAgent->new(
-			agent => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.24 (KHTML, like Gecko) Ubuntu/10.10 Chromium/12.0.703.0 Chrome/12.0.703.0 Safari/534.24'
+			agent => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.24 (KHTML, like Gecko) Ubuntu/10.10 Chromium/12.0.703.0 Chrome/12.0.703.0 Safari/534.24',
+			keep_alive => 1,
+			ssl_opts => { verify_hostname => 0 },
 		);
 
 		$ua->timeout($timeout);
