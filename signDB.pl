@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-$main::engins = {
+$main::engines = {
 	SimpleTDS => [
 		{
 			url => '/header.php',
