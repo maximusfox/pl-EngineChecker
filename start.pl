@@ -8,6 +8,8 @@ use Coro::LWP;
 use Coro::Select;
 
 use LWP::UserAgent;
+use LWP::Protocol::socks;
+
 use List::MoreUtils qw/uniq/;
 
 # Config
@@ -39,8 +41,8 @@ for (1..$threads) {
 		my $ua = LWP::UserAgent->new( agent => 'Mozilla/5.0 (X11; Linux i686; rv:25.0) Gecko/20100101 Firefox/25.0' );
 		$ua->timeout($timeout);
 		$ua->max_redirect(0);
-		$ua->cookie_jar( {} );
-		$ua->proxy(http => $proxy) if ($proxy);
+		$ua->cookie_jar({});
+		$ua->proxy([qw(http https)] => $proxy) if ($proxy);
 
 		while (my $url = <URL>) {
 			next unless (defined $url); chomp($url); next unless (defined $url);
