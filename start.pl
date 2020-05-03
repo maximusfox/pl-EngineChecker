@@ -9,15 +9,15 @@ use Coro::Select;
 use LWP::UserAgent;
 use List::MoreUtils qw/uniq/;
 
-# Cnfig
+# Config
 ###################################
 my $threads = 50;
 my $timeout = 10;
 my $proxy = undef;
 ###################################
 
-# Engins
-my $engins = require('./signDB.pl');
+# Engines
+my $engines = require('./signDB.pl');
 
 # Колбек на сигнал смерти
 $SIG{'INT'} = sub {
@@ -45,10 +45,10 @@ for (1..$threads) {
 			next unless (defined $url); chomp($url); next unless (defined $url);
 
 			my $cashLocal = {};
-			for my $engin ( keys %{$engins} ) {
+			for my $engine ( keys %{$engines} ) {
 
-				for my $path (@{ $engins->{$engin} }) {
-					print "[i] Check URL[ ".$url." ] Engin[".$engin."] Path[".$path->{url}."]\n";
+				for my $path (@{ $engines->{$engine} }) {
+					print "[i] Check URL[ ".$url." ] Engine[".$engine."] Path[".$path->{url}."]\n";
 
 					my $rsURL = $url;
 					$rsURL =~ s!/[^/]{0,}?$!$path->{url}!;
@@ -64,14 +64,14 @@ for (1..$threads) {
 					}
 
 					unless (defined $resp and defined $resp->as_string) {
-						print "[!] Can't get URL[".$rsURL."] [SKIP]\n";
+						print "[!] Cannot get URL[".$rsURL."] [SKIP]\n";
 						next;
 					}
 
 					my $isGood = 0;
 					for my $sign (@{ $path->{signs} }) {
 						if ($resp->as_string =~ $sign) {
-							print "[i] Detected URL[".$url."] PATH[".$path->{url}."] Engine[".$engin."]\n";
+							print "[i] Detected URL[".$url."] PATH[".$path->{url}."] Engine[".$engine."]\n";
 							$isGood++;
 							last;
 						}
