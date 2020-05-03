@@ -38,7 +38,10 @@ unlink('data/log.txt');
 print "[i] Start checking ...\n";
 for (1..$threads) {
 	push @threadsPull, async {
-		my $ua = LWP::UserAgent->new( agent => 'Mozilla/5.0 (X11; Linux i686; rv:25.0) Gecko/20100101 Firefox/25.0' );
+		my $ua = LWP::UserAgent->new(
+			agent => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.24 (KHTML, like Gecko) Ubuntu/10.10 Chromium/12.0.703.0 Chrome/12.0.703.0 Safari/534.24'
+		);
+
 		$ua->timeout($timeout);
 		$ua->max_redirect(0);
 		$ua->cookie_jar({});
