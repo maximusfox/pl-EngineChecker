@@ -86,6 +86,17 @@ for (1..$threads) {
 					} else {
 						print "[i] Send request [".$rsURL."]\n";
 						$resp = $ua->get($rsURL);
+
+						# Проверяем наличие заголовка location в ответе сервера
+						if ($resp->header('Location')||'' ne '') {
+							print "[r] Redirect detected From[".$rsURL."] To[".$resp->header('Location')."]\n";
+							if (this_is_https_redirect($rsURL, $resp->header('Location'))) {
+								print "[r] Follow HTTP->HTTPS redirect From[".$rsURL."] To[".$resp->header('Location')."]\n";
+								$resp = $ua->get($resp->header('Location'));
+							}
+						}
+						print "[i] Request result [".$rsURL."] [".$resp->status_line."]\n";
+
 						$cashLocal->{$path->{url}} = $resp;
 					}
 
@@ -119,6 +130,18 @@ $_->join for (@threadsPull);
 close($_) for (qw/ URL LOG GOOD BAD /);
 print "[i] Finish\n";
 
+# Проверка
+sub this_is_https_redirect {
+	my ($generated_url, $redirect_url) = @_;
+	$redirect_url =~ s!^https?://!!i;
+	$generated_url =~ s!^https?://!!i;
+
+	if ($generated_url eq $redirect_url) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
 
 sub good {
 	my ($url, $file) = @_;
