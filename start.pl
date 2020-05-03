@@ -4,8 +4,9 @@ use strict;
 use warnings;
 
 use Coro;
-use File::Slurp;
+use Coro::LWP;
 use Coro::Select;
+
 use LWP::UserAgent;
 use List::MoreUtils qw/uniq/;
 
