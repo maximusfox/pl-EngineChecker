@@ -56,7 +56,19 @@ for (1..$threads) {
 		$ua->proxy([qw(http https)] => $proxy) if ($proxy);
 
 		while (my $url = <URL>) {
-			next unless (defined $url); chomp($url); next unless (defined $url);
+			next unless (defined $url);
+
+			chomp($url);
+			next unless (defined $url);
+
+			$url =~ s!^\s+|\s+$!!g;
+			next unless (defined $url);
+
+			next if ($url eq '');
+
+			if ($url !~ m#^http#) {
+				$url = "http://$url/";
+			}
 
 			my $cashLocal = {};
 			for my $engine ( keys %{$engines} ) {
