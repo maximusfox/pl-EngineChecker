@@ -29,6 +29,14 @@ $SIG{'INT'} = sub {
 	exit;
 };
 
+# Отключаем проверку SSL сертификатов
+$ENV{HTTPS_DEBUG} = 1;
+$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+IO::Socket::SSL::set_ctx_defaults(
+	SSL_verifycn_scheme => 'www',
+	SSL_verify_mode => 0,
+);
+
 # Открываем список сайтов
 open (URL, '<', 'data/urls.txt') or die "Can't open file data/urls.txt! $! ";
 
