@@ -58,25 +58,32 @@ for (1..$threads) {
 		$ua->cookie_jar({});
 		$ua->proxy([qw(http https)] => $proxy) if ($proxy);
 
-		while (my $url = <URL>) {
-			next unless (defined $url);
+		while (my $line = <URL>) {
+			next unless (defined $line);
 
-			chomp($url);
-			next unless (defined $url);
+			chomp($line);
+			next unless (defined $line);
 
-			$url =~ s!^\s+|\s+$!!g;
-			next unless (defined $url);
+			$line =~ s!^\s+|\s+$!!g;
+			next unless (defined $line);
 
-			next if ($url eq '');
+			next if ($line eq '');
 
-			if ($url !~ m#^http#) {
-				$url = "http://$url/";
+			my $url;
+			my $http_schema = 0;
+			my $https_schema = 0;
+
+			if ($line !~ m#^http#i) {
+				$url = "http://$line/";
+				$http_schema = 1;
 			}
 
 			my $cashLocal = {};
 			for my $engine ( keys %{$engines} ) {
 
 				for my $path (@{ $engines->{$engine} }) {
+					RETRY:
+
 					print "[i] Check URL[ ".$url." ] Engine[".$engine."] Path[".$path->{url}."]\n";
 
 					my $rsURL = $url;
@@ -99,6 +106,14 @@ for (1..$threads) {
 							}
 						}
 						print "[i] Request result [".$rsURL."] [".$resp->status_line."]\n";
+
+						if ($http_schema == 1 and $https_schema == 0 and $resp->code == 500) {
+							$url = "https://$line/";
+							$https_schema = 1;
+							print "[i] Try redirect to HTTPS [".$rsURL."] [".$url."]\n";
+
+							goto RETRY;
+						}
 
 						$cashLocal->{$path->{url}} = $resp;
 					}
